@@ -1,0 +1,27 @@
+-Get movie/actor title
+response.css('title::text').extract_first()
+
+-Get age
+response.css('.noprint.ForceAgeToShow::text').extract_first()
+'80'
+
+-Get grossing
+response.xpath("//th[contains(text(), 'Box office')]/following-sibling::td").css('td::text').extract_first()
+'$30.2 million'
+
+-Get year
+response.css('div.plainlist ul li span span::text')[-1].extract()
+'2017-12-22'
+
+-Get movie list from an actor
+#response.css('div.div-col.columns.column-width ul li i a::attr(href)').extract()
+response.css('div.mw-parser-output ul li a::attr(href)').extract()
+response.css('tr td i a::attr(href)').extract()
+
+
+-Get actor list from a movie
+response.css('div.mw-parser-output ul li a::attr(href)').extract()
+
+
+
+

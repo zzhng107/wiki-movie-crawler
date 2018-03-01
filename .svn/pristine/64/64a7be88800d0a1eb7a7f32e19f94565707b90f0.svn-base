@@ -1,0 +1,55 @@
+from Graph import Graph
+import json
+import unittest
+
+
+class TestStringMethods(unittest.TestCase):
+    def test_year_of_actors(self):
+        with open('graph.json') as my_json:
+            data = json.load(my_json)
+            my_graph = Graph(data[0], data[1], data[2])
+        self.assertListEqual(list(my_graph.year_of_actors('2017')), ['Peter Chernin', 'Mark Bomback', 'Ryan Phillippe', 'Joey King', 'Ki Hong Lee', 'Sydney Park (actress)', 'Alice Lee (actress)', 'Shannon Purser', 'Kevin Hanchard', 'Sherilyn Fenn', 'Elisabeth Röhm', 'Peter Safran', 'Nadia Hilker', 'Joel Silver', 'Felicity Jones', 'Marwan Kenzari', 'Clemens Schick', 'Bill Skarsgård', 'Chosen Jacobs', 'Jean Reno', 'Reem Kherici', 'Camille Chamoux', 'Natalia Verbeke', 'Omar Sy', 'Vincent Lacoste', 'Franck Gastambide', 'Arthur Holden', 'Robert Naylor (actor)', 'Daniel Brochu', 'Grand Corps Malade', 'Roschdy Zem', 'Marie-Claude Pietragalla', 'Mathilde Seigner', 'Sonja Ball', 'Jean Dujardin', 'Clovis Cornillac', 'Terrence Scammell (Canadian actor)', 'Guilaine Londez'])
+        self.assertEqual(list(my_graph.year_of_actors('8888')), [])
+
+
+    def test_year_of_movies(self):
+        with open('graph.json') as my_json:
+            data = json.load(my_json)
+            my_graph = Graph(data[0], data[1], data[2])
+        self.assertListEqual(list(my_graph.year_of_movies('2017')), ['The Greatest Showman', 'The Mountain Between Us (film)', 'War for the Planet of the Apes', 'Wish Upon', 'The Belko Experiment', 'Collide (film)', 'It (2017 film)', 'Mes trésors', 'Sahara (2017 film)', 'Open at Night', 'Primaire', 'Ballerina (2016 film)', 'Chacun sa vie et son intime conviction', 'Coexister', 'Knock (2017 film)', "Don't Tell Her"])
+
+    def test_oldest_actors(self):
+        with open('graph.json') as my_json:
+            data = json.load(my_json)
+            my_graph = Graph(data[0], data[1], data[2])
+        self.assertListEqual(list(my_graph.oldest_actors(2)), ['Micheline Presle', 'François Perrot'])
+
+    def test_richest_actors(self):
+        with open('graph.json') as my_json:
+            data = json.load(my_json)
+            my_graph = Graph(data[0], data[1], data[2])
+        self.assertListEqual(list(my_graph.richest_actors(2)), ['Laurent Capelluto', 'Eddie Frierson'])
+
+    def test_actor_s_movies(self):
+        with open('graph.json') as my_json:
+            data = json.load(my_json)
+            my_graph = Graph(data[0], data[1], data[2])
+        self.assertListEqual(list(my_graph.actor_s_movies('Morgan Freeman')), ['Deep Impact (film)', 'Nurse Betty', 'Along Came a Spider (film)', 'The Sum of All Fears (film)', 'High Crimes', 'Million Dollar Baby', 'Unleashed (film)', 'An Unfinished Life', 'Batman Begins', 'Lucky Number Slevin', 'Evan Almighty', 'Kiss the Girls (1997 film)', 'Amistad (film)'])
+
+    def test_movie_s_actors(self):
+        with open('graph.json') as my_json:
+            data = json.load(my_json)
+            my_graph = Graph(data[0], data[1], data[2])
+        self.assertListEqual(list(my_graph.movie_s_actors('Batman Begins')), ['Morgan Freeman'])
+
+    def test_movie_grossing(self):
+        with open('graph.json') as my_json:
+            data = json.load(my_json)
+            my_graph = Graph(data[0], data[1], data[2])
+
+        self.assertEqual(my_graph.movie_grossing('Batman Begins'), 374.2)
+
+
+
+if __name__ == '__main__':
+    unittest.main()

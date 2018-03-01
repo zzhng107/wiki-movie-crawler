@@ -1,0 +1,122 @@
+import scrapy
+import logging
+
+class Spider(scrapy.Spider):
+
+    name = "myspider"
+    start_urls = ['https://en.wikipedia.org/wiki/Morgan_Freeman']
+
+    visited = {'https://en.wikipedia.org/wiki/Morgan_Freeman':0}
+
+    movies = 0
+    actors = 0
+
+    movie_limit = 125
+    actor_limit = 250
+
+    def parse(self, response):
+
+        # if self.actors < self.actor_limit:
+        try:
+            yield {
+                response.css('title::text').extract_first().replace(' - Wikipedia', ''): int(response.css(
+                    '.noprint.ForceAgeToShow::text').extract_first()[-3:-1])
+            }
+
+            self.actors += 1
+            logging.critical('actors found ==== %d', self.actors)
+
+            if self.movies < self.movie_limit:
+                a = response.css('ul li i a::attr(href)').extract()
+                if a:
+                    a_ = list(map(lambda x: x.replace('_', ' ').replace('/wiki/', ''), a))
+                    yield {
+                        response.css('title::text').extract_first().replace(' - Wikipedia', ''): a_
+                    }
+                    for href in a:
+                        if href not in self.visited:
+                            self.visited[href] = 0
+                            yield response.follow('https://en.wikipedia.org' + href, self.parse_movie)
+
+                else :
+                    # logging.warning("fail to find actor's filmography in way one")
+                    b = response.css('tr td i a::attr(href)').extract()
+                    if not b:
+                        logging.warning("fail to find actor's filmography")
+                    else:
+                        b_ = list(map(lambda x: x.replace('_', ' ').replace('/wiki/', ''), b))
+                        yield {
+                            response.css('title::text').extract_first().replace(' - Wikipedia', ''): b_
+                        }
+                        for href in b:
+                            if href not in self.visited:
+                                self.visited[href] = 0
+                                yield response.follow('https://en.wikipedia.org' + href, self.parse_movie)
+
+        except ValueError:
+            logging.ERROR("fail to convert age to int")
+
+        except:
+            pass
+
+
+
+
+    def parse_movie(self, response):
+
+        # if self.movies < self.movie_limit:
+
+        try:
+
+
+            yield {
+                response.css('title::text').extract_first().replace(' - Wikipedia', ''): {
+                    'grossing': float(response.xpath("//th[contains(text(), 'Box office')]/following-sibling::td").css('td::text').extract_first().replace(' million', '').replace('$','').replace(' billion', '')),
+                    'year': response.css('span.bday.dtstart.published.updated::text')[-1].extract()[:4]
+                }
+            }
+
+            self.movies += 1
+            logging.critical('movies found ==== %d', self.movies)
+
+            if self.actors < self.actor_limit:
+
+                a = response.css('div.mw-parser-output ul li a::attr(href)').extract()
+                a_ = list(map(lambda x: x.replace('_', ' ').replace('/wiki/', ''), a))
+                yield {
+                    response.css('title::text').extract_first().replace(' - Wikipedia', ''): a_
+                }
+                for href in a:
+                    if href not in self.visited:
+                        self.visited[href] = 0
+                        yield response.follow('https://en.wikipedia.org' + href, self.parse)
+
+        except ValueError:
+            logging.error("fail to convert grossing to float")
+
+        except:
+            pass
+
+
+
+
+# import scrapy
+#
+#
+# class ToScrapeCSSSpider(scrapy.Spider):
+#     name = "toscrape-css"
+#     start_urls = [
+#         'http://quotes.toscrape.com/',
+#     ]
+#
+#     def parse(self, response):
+#         for quote in response.css("div.quote"):
+#             yield {
+#                 'text': quote.css("span.text::text").extract_first(),
+#                 'author': quote.css("small.author::text").extract_first(),
+#                 'tags': quote.css("div.tags > a.tag::text").extract()
+#             }
+
+        # next_page_url = response.css("li.next > a::attr(href)").extract_first()
+        # if next_page_url is not None:
+        #     yield scrapy.Request(response.urljoin(next_page_url))
